@@ -29,7 +29,7 @@ function calculateStockEntry(r){
  if(!Number.isSafeInteger(total)||total>1000000)throw Error('Total stock must be at most 1,000,000 pieces.');return total;
 }
 function setupStockEntry(form,p,legacy){
- const stock=form.elements.stock;stock.parentElement.hidden=true;
+ const stock=form.elements.stock;stock.parentElement.hidden=true;stock.parentElement.style.display="none";stock.type="hidden";
  stock.oninput=null;form.elements.piecesPerPack.oninput=null;
  const group=document.createElement('section');group.className='panel';group.style.marginTop='18px';
  group.innerHTML='<h3>Enter stock by unit</h3><p class="hint">Count each item once. For example, enter 3 boxes plus 2 extra packs plus 5 loose pieces.</p><label class="field">Stock action<select id="stock-action"><option value="set">Set total stock on hand</option>'+(p.id?'<option value="add">Add newly received stock</option>':'')+'</select></label><div class="formgrid"><label class="field">Loose pieces<input id="stock-pieces" type="number" min="0" step="1" value="'+(legacy?0:p.stock||0)+'"></label><label class="field"><span id="stock-middle-label">Packs</span><input id="stock-middle" type="number" min="0" step="1" value="'+(legacy?p.stock:0)+'"></label><label class="field"><span id="stock-outer-label">Bundles</span><input id="stock-outer" type="number" min="0" step="1" value="0"></label></div><p id="stock-preview" role="status" style="margin-top:14px"></p>';
