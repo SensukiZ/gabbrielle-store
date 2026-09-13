@@ -1,4 +1,4 @@
-const CACHE='gabbrielle-shell-v3';
+const CACHE='gabbrielle-shell-v4';
 const FILES=['./','./index.html','./style.css','./app.js','./barcode.js','./names.js','./units.js','./bulk.js','./pieces.js','./install.js','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-maskable-512.png'];
 self.addEventListener('install',event=>{event.waitUntil((async()=>{const cache=await caches.open(CACHE);for(const path of FILES){const request=new Request(new URL(path,self.registration.scope),{cache:'reload'});const response=await fetch(request);if(!response.ok||response.redirected)throw Error('Offline download failed');await cache.put(request,response)}})())});
 // Activate on next launch, without replacing a running checkout.
