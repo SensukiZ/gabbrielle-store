@@ -3,3 +3,19 @@
 .brandname{font-size:20px;line-height:1.25;letter-spacing:-.5px}.brandmark{flex-shrink:0}
 .unitbuttons{display:grid;gap:7px;margin-top:14px}.unitbuttons button{font-size:13px;padding:10px 5px}.bundlecheck{display:flex;align-items:center;gap:9px;margin-top:22px;font-size:14px}.barcode-label{text-align:center;border:1px dashed #aaa;padding:14px;margin:18px 0;break-inside:avoid;color:black;background:white}.barcode-label svg{width:100%;height:auto;max-width:370px}.barcode-label div{margin-top:7px;font-size:14px}@media print{.dialog:has(.labels)>h2,.dialog:has(.labels)>p,.dialog:has(.labels)>.actions{display:none}.barcode-label{width:100mm;margin:8mm auto}}
 .bulkdialog{max-width:1200px}.bulktable{min-width:1050px}.bulktable th{font-size:12px;white-space:normal}.bulktable td{padding:7px 4px}.bulktable input{width:100%;min-width:95px;padding:10px 7px;border:1px solid #cddbd3;border-radius:6px;font-size:14px}.bulktable td:first-child{min-width:170px}.bulkdialog .actions{flex-wrap:wrap}
+/* Compact receipt on regular A4 or Letter paper. */
+@media print {
+  @page { size: auto; margin: 10mm; }
+  body:has(.receipt) { background: #fff; color: #000; }
+  body > .dialogback:has(.receipt) { padding: 0!important; margin: 0!important; }
+  .dialog:has(.receipt) { width: 80mm; max-width: 80mm; padding: 3mm; margin: 0; border: 0; border-radius: 0; overflow: visible; }
+  .dialog:has(.receipt) .actions { display: none!important; }
+  .receipt, .receipt h2, .receipt p, .receipt .hint, .receipt .eyebrow { font-family: Arial, sans-serif; color: #000!important; }
+  .receipt { font-size: 10pt; line-height: 1.3; }
+  .receipt h2 { font-size: 14pt; letter-spacing: 0; }
+  .receipt .eyebrow { font-size: 8pt; margin-bottom: 2mm; }
+  .receipt .hint { font-size: 8pt; margin: 2mm 0 3mm!important; }
+  .receipt .line { align-items: flex-start; gap: 3mm; padding: 2mm 0; border-color: #555; break-inside: avoid; }
+  .receipt .line > :first-child { min-width: 0; overflow-wrap: anywhere; }
+  .receipt .line > :last-child { flex-shrink: 0; white-space: nowrap; }
+}
