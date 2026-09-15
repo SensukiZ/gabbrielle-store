@@ -1,8 +1,9 @@
-const CACHE='gabbrielle-shell-v7';
+const CACHE='gabbrielle-shell-v8';
 const FILES=['./','./index.html','./style.css','./app.js','./barcode.js','./names.js','./units.js','./bulk.js','./pieces.js','./install.js','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-maskable-512.png'];
 self.addEventListener('install',event=>{event.waitUntil((async()=>{const cache=await caches.open(CACHE);for(const path of FILES){const request=new Request(new URL(path,self.registration.scope),{cache:'reload'});const response=await fetch(request);if(!response.ok||response.redirected)throw Error('Offline download failed');await cache.put(request,response)}})())});
 // Activate on next launch, without replacing a running checkout.
 self.addEventListener('activate',event=>event.waitUntil((async()=>{for(const name of await caches.keys())if(name.startsWith('gabbrielle-shell-')&&name!==CACHE)await caches.delete(name);await self.clients.claim()})()));
 self.addEventListener('fetch',event=>{const url=new URL(event.request.url);if(event.request.method!=='GET'||url.origin!==self.location.origin)return;const isAsset=FILES.some(path=>new URL(path,self.registration.scope).href===url.href);if(!isAsset&&event.request.mode!=='navigate')return;event.respondWith((async()=>{const cache=await caches.open(CACHE);if(event.request.mode==='navigate'){const page=await cache.match(new URL('./index.html',self.registration.scope).href);if(page)return page}const cached=await cache.match(event.request);return cached||fetch(event.request)})())});
+
 
 
