@@ -28,7 +28,53 @@ let previousFocus;function dialog(html){closeDialog();previousFocus=document.act
 function closeDialog(){clearTimeout(scanTimer);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}document.querySelector('.dialogback')?.remove();previousFocus?.focus()}
 function productForm(id){const p=data.products.find(p=>p.id===id)||{name:'',barcode:'',category:'Pantry',price:0,stock:0};dialog(`<h2>${id?'Edit product':'Add a product'}</h2><form id="productform"><label class="field">Product name<input name="name" required maxlength="100" value="${esc(p.name)}" placeholder="e.g. Sardines · 155g"></label><label class="field">Barcode or item code<input name="barcode" maxlength="80" value="${esc(p.barcode)}" placeholder="Scan or type the package barcode"></label><div class="formgrid"><label class="field">Selling price (₱)<input name="price" type="number" min="0" max="1000000" step="0.01" required value="${id?p.price/100:''}"></label><label class="field">Stock on hand<input name="stock" type="number" min="0" max="1000000" step="1" required value="${p.stock}"></label></div><label class="field">Category<select name="category">${['Pantry','Drinks','Snacks','Canned goods','Household','Personal care','Other',...(!['Pantry','Drinks','Snacks','Canned goods','Household','Personal care','Other'].includes(p.category)?[p.category]:[])].map(c=>`<option ${c===p.category?'selected':''}>${esc(c)}</option>`).join('')}</select></label><div class="actions"><button type="button" id="cancel">Cancel</button><button class="primary" type="submit">Save product</button></div></form>`);document.getElementById('productform').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);const product={id:id||crypto.randomUUID(),name:f.get('name').trim(),barcode:f.get('barcode').trim(),price:Math.round(Number(f.get('price'))*100),stock:Number(f.get('stock')),category:f.get('category')};if(!product.name)return toast('Enter a product name.');if(product.barcode&&data.products.some(x=>x.id!==id&&x.barcode===product.barcode))return toast('That barcode already belongs to another product.');if((cart[product.id]||0)>product.stock)return toast('Stock cannot be less than the quantity in your current sale.');const next={...data,products:id?data.products.map(x=>x.id===id?product:x):[...data.products,product]};if(!validData(next))return toast('Check the price and stock values.');if(save(next)){closeDialog();render();toast('Product saved')}}}
 function checkout(){if(!Object.keys(cart).length)return;const t=total();const items=Object.entries(cart).map(([id,qty])=>({...data.products.find(p=>p.id===id),qty}));if(items.some(i=>i.qty>i.stock))return toast('Stock changed. Check your sale.');const s={id:crypto.randomUUID(),date:new Date().toISOString(),total:t,items:items.map(i=>({name:i.name,price:i.price,qty:i.qty}))};const next={...data,products:data.products.map(p=>({...p,stock:p.stock-(cart[p.id]||0)})),sales:[...data.sales,s]};if(save(next)){cart={};cash='';render();receipt(s)}}
-function receipt(s){lastReceipt=s;dialog(`<div class="receipt"><p class="eyebrow" style="text-align:center">${data.demo?'Demo sale':'Sale complete'}</p><h2>GabBrielle Store</h2><p style="text-align:center">Salamat, suki!</p><p class="hint" style="text-align:center;margin:12px 0 20px">${esc(new Date(s.date).toLocaleString('en-PH'))}<br>Store record · ${esc(s.id.slice(0,8))}</p>${s.items.map(i=>`<div class="line"><span>${i.qty} × ${esc(i.name)}</span><b>${money(i.price*i.qty)}</b></div>`).join('')}<div class="line"><b>Total</b><b>${money(s.total)}</b></div></div><div class="actions"><button id="print">Print</button><button class="primary" id="cancel">Done</button></div>`);document.getElementById('print').onclick=()=>window.print()}
-async function camera(){if(!('BarcodeDetector' in window)){toast('Camera scanning is unavailable in this browser. Use a USB scanner or type the barcode.');return}dialog('<h2>Scan a barcode</h2><p class="hint" style="margin-top:12px">Point the camera at the package barcode.</p><video autoplay playsinline muted></video><p id="scanstatus" class="hint">Starting camera…</p><div class="actions"><button id="cancel">Cancel</button></div>');const video=document.querySelector('video');try{const formats=await BarcodeDetector.getSupportedFormats();const supported=['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf'].filter(f=>formats.includes(f));if(!supported.length)throw Error('No supported barcode formats');const detector=new BarcodeDetector({formats:supported});const acquired=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}});if(!video.isConnected){acquired.getTracks().forEach(t=>t.stop());return}stream=acquired;video.srcObject=stream;await video.play();document.getElementById('scanstatus').textContent='Hold the barcode steady in view.';const scan=async()=>{if(!stream||!video.isConnected)return;try{const codes=await detector.detect(video);if(codes.length){const code=codes[0].rawValue;closeDialog();lookup(code);return}}catch{}scanTimer=setTimeout(scan,250)};scan()}catch{if(video.isConnected){closeDialog();toast('Camera could not start. Check camera permission, or type the barcode.')}}}
+function receipt(s){
+  lastReceipt=s;
+
+  const itemsHtml=s.items.map(i=>`
+    <div class="receipt-item" style="padding:10px 0;border-bottom:1px solid #eee">
+      <div style="font-weight:600;margin-bottom:4px">
+        ${esc(i.name)}
+      </div>
+      <div class="line">
+        <span class="hint">${money(i.price)} × ${i.qty}</span>
+        <b>${money(i.price*i.qty)}</b>
+      </div>
+    </div>
+  `).join('');
+
+  dialog(`
+    <div class="receipt">
+      <p class="eyebrow" style="text-align:center">
+        ${data.demo?'Demo sale':'Sale complete'}
+      </p>
+
+      <h2>GabBrielle Store</h2>
+
+      <p style="text-align:center">Salamat, suki!</p>
+
+      <p class="hint" style="text-align:center;margin:12px 0 20px">
+        ${esc(new Date(s.date).toLocaleString('en-PH'))}<br>
+        Store record · ${esc(s.id.slice(0,8))}
+      </p>
+
+      <div style="margin-bottom:12px">
+        ${itemsHtml}
+      </div>
+
+      <div class="line" style="border-top:2px solid #222;padding-top:12px;margin-top:8px">
+        <b>TOTAL</b>
+        <b>${money(s.total)}</b>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="print">Print</button>
+      <button class="primary" id="cancel">Done</button>
+    </div>
+  `);
+
+  document.getElementById('print').onclick=()=>window.print();
+}async function camera(){if(!('BarcodeDetector' in window)){toast('Camera scanning is unavailable in this browser. Use a USB scanner or type the barcode.');return}dialog('<h2>Scan a barcode</h2><p class="hint" style="margin-top:12px">Point the camera at the package barcode.</p><video autoplay playsinline muted></video><p id="scanstatus" class="hint">Starting camera…</p><div class="actions"><button id="cancel">Cancel</button></div>');const video=document.querySelector('video');try{const formats=await BarcodeDetector.getSupportedFormats();const supported=['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf'].filter(f=>formats.includes(f));if(!supported.length)throw Error('No supported barcode formats');const detector=new BarcodeDetector({formats:supported});const acquired=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}});if(!video.isConnected){acquired.getTracks().forEach(t=>t.stop());return}stream=acquired;video.srcObject=stream;await video.play();document.getElementById('scanstatus').textContent='Hold the barcode steady in view.';const scan=async()=>{if(!stream||!video.isConnected)return;try{const codes=await detector.detect(video);if(codes.length){const code=codes[0].rawValue;closeDialog();lookup(code);return}}catch{}scanTimer=setTimeout(scan,250)};scan()}catch{if(video.isConnected){closeDialog();toast('Camera could not start. Check camera permission, or type the barcode.')}}}
 window.addEventListener('storage',e=>{if(e.key===KEY){try{const d=JSON.parse(e.newValue);if(validData(d)){data=d;cart={};cash='';closeDialog();render();toast('Store updated from another tab. Current sale cleared.')}}catch{}}});render();
 if(document.modelContext?.registerTool){const lifecycle=new AbortController();window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});const tool={name:'stage_barcode_in_sale',title:'Add barcode to current sale',description:'Add one product matching a barcode to the visible current sale. Does not complete or record a sale.',inputSchema:{type:'object',properties:{barcode:{type:'string'}},required:['barcode'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute(input){if(!input||typeof input.barcode!=='string'||!input.barcode.trim())throw Error('A barcode is required.');const p=data.products.find(p=>p.barcode===input.barcode.trim()||p.bundleBarcode===input.barcode.trim()||p.pieceBarcode===input.barcode.trim());if(!p)throw Error('Barcode not found.');const key=sellingUnits(p).find(u=>u.code===input.barcode.trim()).key;const unit=sellable(key);if(reservedPacks(p.id)+unit.factor>p.stock)throw Error('Insufficient stock.');page='counter';render();add(key);return{product:unit.name,quantity:cart[key],totalCentavos:total()}}};try{Promise.resolve(document.modelContext.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{})}catch{}}
