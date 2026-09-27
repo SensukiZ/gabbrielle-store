@@ -32,15 +32,16 @@ function receipt(s){
   lastReceipt=s;
 
   const itemsHtml=s.items.map(i=>`
-    <div class="receipt-item" style="padding:10px 0;border-bottom:1px solid #eee">
-      <div style="font-weight:600;margin-bottom:4px">
-       ${esc(i.name.replace(/\s*[-–—]\s*(pack|packs|bundle|bundles)\s*$/i, ''))}
-      </div>
-      <div class="line">
-        <span class="hint">${i.qty} × ${money(i.price)}</span>
-         <b>${money(i.qty * i.price)}</b>
-      </div>
-    </div>
+    <div class="receipt-item" style="padding:4px 0;border-bottom:1px solid #eee">
+  <div style="font-weight:600;line-height:1.2;margin-bottom:2px">
+    ${esc(i.name.replace(/\s*[-–—]?\s*(pack|packs|bundle|bundles)\s*$/i, ''))}
+  </div>
+
+  <div class="line" style="line-height:1.2">
+    <span class="hint">${i.qty} × ${money(i.price)}</span>
+    <b>${money(i.qty * i.price)}</b>
+  </div>
+  </div>
   `).join('');
 
   dialog(`
