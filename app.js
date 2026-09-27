@@ -34,11 +34,11 @@ function receipt(s){
   const itemsHtml=s.items.map(i=>`
     <div class="receipt-item" style="padding:10px 0;border-bottom:1px solid #eee">
       <div style="font-weight:600;margin-bottom:4px">
-        ${esc(i.name)}
+       ${esc(i.name.replace(/\s*[-–—]\s*(pack|packs|bundle|bundles)\s*$/i, ''))}
       </div>
       <div class="line">
-        <span class="hint">${money(i.price)} × ${i.qty}</span>
-        <b>${money(i.price*i.qty)}</b>
+        <span class="hint">${i.qty} × ${money(i.price)}</span>
+          <b>${money(i.qty * i.price)}</b>
       </div>
     </div>
   `).join('');
