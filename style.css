@@ -30,3 +30,36 @@
 .receipt .receipt-item-detail{padding:0;border:0;line-height:1.25}
 .receipt-divider{border-top:1px solid #d5ded7;margin:6px 0 4px}
 .receipt .receipt-total{padding:0;border:0;font-size:16px}
+
+@media print {
+  .receipt {
+    line-height: 1.15;
+  }
+
+  .receipt-meta {
+    margin: 3px 0 5px !important;
+  }
+
+  .receipt-items {
+    gap: 0;
+  }
+
+  .receipt-item {
+    padding: 0;
+    margin: 0;
+  }
+
+  .receipt .receipt-item-detail {
+    padding: 0 !important;
+    margin: 0;
+    line-height: 1.15;
+  }
+
+  .receipt-divider {
+    margin: 3px 0;
+  }
+
+  .receipt .receipt-total {
+    padding: 0 !important;
+  }
+}
