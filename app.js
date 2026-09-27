@@ -38,7 +38,7 @@ function receipt(s){
       </div>
       <div class="line">
         <span class="hint">${i.qty} × ${money(i.price)}</span>
-          <b>${money(i.qty * i.price)}</b>
+         <b>${money(i.qty * i.price)}</b>
       </div>
     </div>
   `).join('');
