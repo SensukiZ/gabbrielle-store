@@ -19,3 +19,14 @@
   .receipt .line > :first-child { min-width: 0; overflow-wrap: anywhere; }
   .receipt .line > :last-child { flex-shrink: 0; white-space: nowrap; }
 }
+
+/* Compact on-screen receipt rows. */
+.receipt{line-height:1.35}
+.receipt-status,.receipt-thanks{text-align:center}
+.receipt-meta{text-align:center!important;margin:6px 0 8px!important}
+.receipt-items{display:grid;gap:4px}
+.receipt-item{padding:1px 0}
+.receipt-name{font-weight:600;line-height:1.25}
+.receipt .receipt-item-detail{padding:0;border:0;line-height:1.25}
+.receipt-divider{border-top:1px solid #d5ded7;margin:6px 0 4px}
+.receipt .receipt-total{padding:0;border:0;font-size:16px}
