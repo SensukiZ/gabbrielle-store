@@ -31,34 +31,11 @@
 .receipt-divider{border-top:1px solid #d5ded7;margin:6px 0 4px}
 .receipt .receipt-total{padding:0;border:0;font-size:16px}
 
-@media print {
-  .receipt .receipt-items {
-    display: block !important;
-  }
-
-  .receipt .receipt-item {
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
+@media print {.receipt .receipt-items {display: block !important;}
+  .receipt .receipt-item {padding: 0 !important;margin: 0 !important;}
   /* Small, readable gap between products */
-  .receipt .receipt-item + .receipt-item {
-    margin-top: 6px !important;
-  }
-
-  .receipt .receipt-name {
-    margin: 0 0 2px !important;
-    line-height: 14px !important;
-  }
-
+  .receipt .receipt-item + .receipt-item {margin-top: 6px !important;}
+  .receipt .receipt-name {margin: 0 0 2px !important;line-height: 14px !important;}
   .receipt .line.receipt-item-detail,
-  .receipt .line.receipt-item-detail .hint {
-    padding: 0 !important;
-    margin: 0 !important;
-    line-height: 14px !important;
-  }
-
-  .receipt .receipt-divider {
-    margin: 5px 0 4px !important;
-  }
-}
+  .receipt .line.receipt-item-detail .hint {padding: 0 !important;margin: 0 !important;line-height: 14px !important;}
+  .receipt .receipt-divider {margin: 5px 0 4px !important;}}
